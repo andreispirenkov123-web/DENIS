@@ -67,10 +67,10 @@
 
         <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="0" Margin="0,14,0,0" MaxHeight="230">
             <StackPanel>
-                <TextBlock Text="Топ клиентов" Style="{StaticResource SectionTitleText}" Margin="16,14,16,8" />
-                <DataGrid ItemsSource="{Binding TopClients}" BorderThickness="0">
+                <TextBlock Text="Топ магазинов" Style="{StaticResource SectionTitleText}" Margin="16,14,16,8" />
+                <DataGrid ItemsSource="{Binding TopStores}" BorderThickness="0">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="*" />
+                        <DataGridTextColumn Header="Магазин" Binding="{Binding StoreName}" Width="*" />
                         <DataGridTextColumn Header="Продаж" Binding="{Binding SalesCount}" Width="100" />
                         <DataGridTextColumn Header="Сумма, ₽" Binding="{Binding TotalSumText}" Width="150" />
                     </DataGrid.Columns>

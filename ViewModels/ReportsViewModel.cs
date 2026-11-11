@@ -14,7 +14,7 @@ public class ReportsViewModel : PageViewModelBase
     private DateTime _toDate = DateTime.Today;
     private List<CategoryTotal> _categoryRows = new();
     private List<ProductTotal> _topProducts = new();
-    private List<ClientTotal> _topClients = new();
+    private List<StoreTotal> _topStores = new();
     private string _summary = string.Empty;
 
     public ReportsViewModel()
@@ -51,10 +51,10 @@ public class ReportsViewModel : PageViewModelBase
         private set => SetProperty(ref _topProducts, value);
     }
 
-    public List<ClientTotal> TopClients
+    public List<StoreTotal> TopStores
     {
-        get => _topClients;
-        private set => SetProperty(ref _topClients, value);
+        get => _topStores;
+        private set => SetProperty(ref _topStores, value);
     }
 
     public string Summary
@@ -80,7 +80,7 @@ public class ReportsViewModel : PageViewModelBase
         {
             CategoryRows = Database.GetSalesByCategory(FromDate, ToDate);
             TopProducts = Database.GetTopProducts(FromDate, ToDate);
-            TopClients = Database.GetTopClients(FromDate, ToDate);
+            TopStores = Database.GetTopStores(FromDate, ToDate);
             var sales = CategoryRows.Sum(r => r.SalesCount);
             var sum = CategoryRows.Sum(r => r.TotalSum);
             Summary = $"Период: {FromDate:dd.MM.yyyy} – {ToDate:dd.MM.yyyy}   |   Продаж: {sales}   |   Сумма: {sum:N0} ₽";
@@ -110,9 +110,9 @@ public class ReportsViewModel : PageViewModelBase
             foreach (var item in TopProducts)
                 sb.AppendLine($"{item.ProductName};{item.Quantity};{item.TotalSum:F2}");
             sb.AppendLine();
-            sb.AppendLine("Клиент;Продаж;Сумма, руб.");
-            foreach (var client in TopClients)
-                sb.AppendLine($"{client.ClientName};{client.SalesCount};{client.TotalSum:F2}");
+            sb.AppendLine("Магазин;Продаж;Сумма, руб.");
+            foreach (var store in TopStores)
+                sb.AppendLine($"{store.StoreName};{store.SalesCount};{store.TotalSum:F2}");
             File.WriteAllText(dialog.FileName, sb.ToString(), new UTF8Encoding(true));
             _dialogService.ShowDialog("Отчёт сохранён в файл:\n" + dialog.FileName, "Экспорт завершён", DialogType.Info);
         }

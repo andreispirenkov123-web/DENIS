@@ -1,0 +1,112 @@
+<Page x:Class="HouseholdGoodsIS.Views.Pages.ProductDetailPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Карточка товара" Background="Transparent">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="24,14,24,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                <Button Content="← Назад в каталог" Style="{StaticResource LinkButton}"
+                        Command="{Binding BackCommand}" FontSize="13" />
+                <TextBlock Text="{Binding Product.CategoryName}" Style="{StaticResource SecondaryText}"
+                           VerticalAlignment="Center" Margin="16,0,0,0" />
+                <TextBlock Text=" / " Style="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Product.Name}" Style="{StaticResource SecondaryText}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="380" />
+                    <ColumnDefinition Width="26" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Height="300" CornerRadius="8" BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1">
+                    <Border.Background>
+                        <ImageBrush Stretch="Uniform" ImageSource="{Binding Product.ImagePath,
+                            Converter={StaticResource ImageConverter}}" />
+                    </Border.Background>
+                </Border>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="{Binding Product.CategoryName}" Style="{StaticResource SecondaryText}" />
+                    <TextBlock Text="{Binding Product.Name}" FontSize="26" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" TextWrapping="Wrap" Margin="0,4,0,10" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE735;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                   Foreground="{StaticResource AccentDarkBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Product.RatingText}" FontSize="15" FontWeight="SemiBold"
+                                   Margin="5,0,4,0" Foreground="{StaticResource TextBrush}" />
+                        <TextBlock FontSize="13" VerticalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}">
+                            <Run Text="· " /><Run Text="{Binding Product.ReviewsCount}" /><Run Text=" отзывов" />
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,4">
+                        <TextBlock Text="{Binding Product.PriceText}" FontSize="32" FontWeight="Bold"
+                                   Foreground="{StaticResource TextBrush}" />
+                        <TextBlock Text="{Binding Product.OldPriceText}" Style="{StaticResource SecondaryText}"
+                                   FontSize="15" TextDecorations="Strikethrough" Margin="12,0,0,4"
+                                   VerticalAlignment="Bottom" />
+                    </StackPanel>
+                    <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,2,0,14"
+                               Foreground="{Binding Product.Stock, Converter={StaticResource StockToBrush}}">
+                        <Run Text="В наличии: " /><Run Text="{Binding Product.Stock}" /><Run Text=" шт. · " />
+                        <Run Text="{Binding Product.WarrantyText, Mode=OneWay}" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Купить" Width="190" Height="42" FontSize="15"
+                                Style="{StaticResource PrimaryButton}" Command="{Binding AddToCartCommand}" />
+                        <Button Content="Назад" Width="120" Height="42" Margin="10,0,0,0"
+                                Style="{StaticResource SecondaryButton}" Command="{Binding BackCommand}" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource SuccessBrush}"
+                               FontSize="12" Margin="0,10,0,0" />
+                </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="2" Height="1" Background="{StaticResource BorderBrush}" Margin="0,20" />
+
+            <StackPanel Grid.Row="3">
+                <TextBlock Text="Описание" Style="{StaticResource SectionTitleText}" Margin="0,0,0,8" />
+                <TextBlock Text="{Binding Description}" FontSize="14" TextWrapping="Wrap" LineHeight="22"
+                           Foreground="{StaticResource TextBrush}" />
+
+                <TextBlock Text="Характеристики" Style="{StaticResource SectionTitleText}" Margin="0,22,0,10" />
+                <ItemsControl ItemsSource="{Binding Groups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextBrush}" Margin="0,0,0,6" />
+                                <Border Style="{StaticResource CardBorder}" Padding="0">
+                                    <ItemsControl ItemsSource="{Binding Items}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="14,8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="280" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Name}" Style="{StaticResource SecondaryText}"
+                                                               FontSize="13" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="13"
+                                                               Foreground="{StaticResource TextBrush}" TextWrapping="Wrap" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

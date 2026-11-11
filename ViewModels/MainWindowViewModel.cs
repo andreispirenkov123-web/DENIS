@@ -10,6 +10,7 @@ public class MainWindowViewModel : ViewModelBase
     private readonly ProductsViewModel _products;
     private readonly CartViewModel _cart;
     private ViewModelBase? _selectedPage;
+    private ViewModelBase? _previousPage;
     private string _globalSearch = string.Empty;
 
     public MainWindowViewModel(AppUser account)
@@ -58,7 +59,6 @@ public class MainWindowViewModel : ViewModelBase
         Pages.Add(_cart);
         Pages.Add(new WarehouseViewModel());
         Pages.Add(new SalesViewModel());
-        Pages.Add(new ClientsViewModel());
         Pages.Add(new SuppliesViewModel());
         if (Account.RoleId == 1)
             Pages.Add(new UsersViewModel());
@@ -93,6 +93,18 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     public void NavigateHome() => SelectedPage = _dashboard;
+
+    public void ShowProduct(Product product)
+    {
+        if (SelectedPage is not ProductDetailViewModel)
+            _previousPage = SelectedPage;
+        SelectedPage = new ProductDetailViewModel(product);
+    }
+
+    public void NavigateBack()
+    {
+        SelectedPage = _previousPage ?? (Pages.Count > 1 ? Pages[1] : Pages.FirstOrDefault());
+    }
 
     private void OnCartChanged()
     {

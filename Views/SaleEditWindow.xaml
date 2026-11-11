@@ -32,8 +32,8 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <TextBlock Text="Клиент *" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />
-                            <ComboBox x:Name="ClientBox" DisplayMemberPath="FullName" />
+                            <TextBlock Text="Магазин самовывоза *" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />
+                            <ComboBox x:Name="StoreBox" DisplayMemberPath="DisplayName" />
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Менеджер *" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />

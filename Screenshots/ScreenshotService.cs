@@ -70,7 +70,6 @@ public static class ScreenshotService
         CaptureMain(admin, 1, 0, Path.Combine(directory, "05_catalog_cards.png"));
         CaptureMain(admin, 1, 1, Path.Combine(directory, "06_catalog_list.png"));
         CaptureMain(admin, 4, 0, Path.Combine(directory, "07_orders.png"));
-        CaptureMain(admin, 5, 0, Path.Combine(directory, "08_clients.png"));
         CaptureMain(admin, 2, 0, Path.Combine(directory, "13_cart.png"));
         CaptureMain(admin, 3, 0, Path.Combine(directory, "19_warehouse.png"));
         CaptureMain(admin, 7, 0, Path.Combine(directory, "12_users.png"));
@@ -83,20 +82,37 @@ public static class ScreenshotService
         if (product != null)
             CaptureWindow(new ProductEditWindow(product) { Width = 660 }, Path.Combine(directory, "15_product_edit.png"));
             var detailProduct = Database.GetProducts().FirstOrDefault(p => p.Sku == "NB-001") ?? product;
-            CaptureWindow(new ProductDetailWindow(detailProduct) { Width = 920, Height = 720 },
-                Path.Combine(directory, "21_product_detail.png"));
+            CaptureProductDetail(admin, detailProduct, Path.Combine(directory, "21_product_detail.png"));
             CaptureWindow(new StockAdjustmentWindow(product, false) { Width = 470 },
                 Path.Combine(directory, "20_stock_adjustment.png"));
         var sale = Database.GetSales().FirstOrDefault();
         if (sale != null)
             CaptureWindow(new SaleEditWindow(sale) { Width = 820, Height = 720 },
                 Path.Combine(directory, "16_sale_edit.png"));
-        var client = Database.GetClients().FirstOrDefault();
-        if (client != null)
-            CaptureWindow(new ClientEditWindow(client) { Width = 560 }, Path.Combine(directory, "17_client_edit.png"));
         var user = Database.GetUsers().FirstOrDefault();
         if (user != null)
             CaptureWindow(new UserEditWindow(user) { Width = 560 }, Path.Combine(directory, "18_user_edit.png"));
+    }
+
+    private static void CaptureProductDetail(AppUser account, Product product, string path)
+    {
+        var window = new MainWindow(account) { Width = 1440, Height = 900 };
+        window.WindowStartupLocation = WindowStartupLocation.Manual;
+        window.Left = 20;
+        window.Top = 20;
+        window.ShowInTaskbar = false;
+        window.Show();
+        DoEvents();
+        Thread.Sleep(500);
+        window.ViewModel.ShowProduct(product);
+        DoEvents();
+        Thread.Sleep(700);
+        window.UpdateLayout();
+        DoEvents();
+        using var bitmap = Capture(window);
+        bitmap.Save(path, ImageFormat.Png);
+        window.Close();
+        DoEvents();
     }
 
     private static void CaptureMain(AppUser account, int pageIndex, int tabIndex, string path)

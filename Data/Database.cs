@@ -625,16 +625,15 @@ public static class Database
         var list = new List<Sale>();
         using var connection = CreateConnection();
         using var command = new NpgsqlCommand(
-            @"SELECT sa.id, sa.client_id,
-                     cl.last_name || ' ' || cl.first_name || COALESCE(' ' || cl.middle_name,'') AS client_name,
+            @"SELECT sa.id, sa.pickup_store_id, st.name AS store_name,
                      sa.manager_id, u.last_name || ' ' || u.first_name AS manager_name,
                      sa.sale_date, sa.total_amount, sa.discount, sa.status, sa.payment_method,
                      COALESCE((SELECT SUM(p.amount) FROM payment p WHERE p.sale_id = sa.id), 0) AS paid,
                      (SELECT count(*) FROM sale_item si WHERE si.sale_id = sa.id) AS items_count
               FROM sale sa
-              JOIN client cl ON cl.id = sa.client_id
+              JOIN store st ON st.id = sa.pickup_store_id
               JOIN app_user u ON u.id = sa.manager_id
-              WHERE (@s = '' OR cl.last_name ILIKE '%' || @s || '%' OR cl.first_name ILIKE '%' || @s || '%'
+              WHERE (@s = '' OR st.name ILIKE '%' || @s || '%' OR st.address ILIKE '%' || @s || '%'
                      OR u.last_name ILIKE '%' || @s || '%')
                 AND (@status = '' OR sa.status = @status)
               ORDER BY sa.sale_date DESC, sa.id DESC", connection);
@@ -649,14 +648,13 @@ public static class Database
     {
         using var connection = CreateConnection();
         using var command = new NpgsqlCommand(
-            @"SELECT sa.id, sa.client_id,
-                     cl.last_name || ' ' || cl.first_name || COALESCE(' ' || cl.middle_name,'') AS client_name,
+            @"SELECT sa.id, sa.pickup_store_id, st.name AS store_name,
                      sa.manager_id, u.last_name || ' ' || u.first_name AS manager_name,
                      sa.sale_date, sa.total_amount, sa.discount, sa.status, sa.payment_method,
                      COALESCE((SELECT SUM(p.amount) FROM payment p WHERE p.sale_id = sa.id), 0) AS paid,
                      (SELECT count(*) FROM sale_item si WHERE si.sale_id = sa.id) AS items_count
               FROM sale sa
-              JOIN client cl ON cl.id = sa.client_id
+              JOIN store st ON st.id = sa.pickup_store_id
               JOIN app_user u ON u.id = sa.manager_id
               WHERE sa.id = @id", connection);
         command.Parameters.AddWithValue("id", id);
@@ -666,7 +664,7 @@ public static class Database
 
     private static Sale ReadSale(NpgsqlDataReader r) => new()
     {
-        Id = r.GetInt32(0), ClientId = r.GetInt32(1), ClientName = r.GetString(2), ManagerId = r.GetInt32(3),
+        Id = r.GetInt32(0), PickupStoreId = r.GetInt32(1), StoreName = r.GetString(2), ManagerId = r.GetInt32(3),
         ManagerName = r.GetString(4), SaleDate = r.GetDateTime(5), TotalAmount = r.GetDecimal(6),
         Discount = r.GetDecimal(7), Status = r.GetString(8), PaymentMethod = r.GetString(9),
         PaidAmount = r.GetDecimal(10), ItemsCount = Convert.ToInt32(r.GetInt64(11))
@@ -704,15 +702,16 @@ public static class Database
             if (sale.Id == 0)
             {
                 using var command = new NpgsqlCommand(
-                    @"INSERT INTO sale (client_id, manager_id, sale_date, total_amount, discount, status, payment_method)
-                      VALUES (@cl,@mgr,@date,@total,@discount,@status,@method) RETURNING id", connection, transaction);
+                    @"INSERT INTO sale (client_id, pickup_store_id, manager_id, sale_date, total_amount, discount, status, payment_method)
+                      VALUES ((SELECT id FROM client WHERE phone = '+7 (000) 000-00-00' LIMIT 1),
+                              @store,@mgr,@date,@total,@discount,@status,@method) RETURNING id", connection, transaction);
                 AddSaleParams(command, sale, total);
                 sale.Id = Convert.ToInt32(command.ExecuteScalar());
             }
             else
             {
                 using var command = new NpgsqlCommand(
-                    @"UPDATE sale SET client_id=@cl, manager_id=@mgr, sale_date=@date, total_amount=@total,
+                    @"UPDATE sale SET pickup_store_id=@store, manager_id=@mgr, sale_date=@date, total_amount=@total,
                            discount=@discount, status=@status, payment_method=@method WHERE id=@id",
                     connection, transaction);
                 AddSaleParams(command, sale, total);
@@ -750,7 +749,7 @@ public static class Database
 
     private static void AddSaleParams(NpgsqlCommand command, Sale sale, decimal total)
     {
-        command.Parameters.AddWithValue("cl", sale.ClientId);
+        command.Parameters.AddWithValue("store", sale.PickupStoreId);
         command.Parameters.AddWithValue("mgr", sale.ManagerId);
         command.Parameters.AddWithValue("date", sale.SaleDate);
         command.Parameters.AddWithValue("total", total);
@@ -1077,23 +1076,40 @@ public static class Database
         return list;
     }
 
-    public static List<ClientTotal> GetTopClients(DateTime from, DateTime to)
+    public static List<StoreTotal> GetTopStores(DateTime from, DateTime to)
     {
-        var list = new List<ClientTotal>();
+        var list = new List<StoreTotal>();
         using var connection = CreateConnection();
         using var command = new NpgsqlCommand(
-            @"SELECT cl.last_name || ' ' || cl.first_name, count(*), COALESCE(SUM(sa.total_amount),0)
-              FROM sale sa JOIN client cl ON cl.id = sa.client_id
+            @"SELECT st.name, count(*), COALESCE(SUM(sa.total_amount),0)
+              FROM sale sa JOIN store st ON st.id = sa.pickup_store_id
               WHERE sa.sale_date BETWEEN @f AND @t AND sa.status <> 'Отменена'
-              GROUP BY cl.last_name, cl.first_name ORDER BY SUM(sa.total_amount) DESC LIMIT 10", connection);
+              GROUP BY st.name ORDER BY SUM(sa.total_amount) DESC LIMIT 10", connection);
         command.Parameters.AddWithValue("f", from);
         command.Parameters.AddWithValue("t", to);
         using var reader = command.ExecuteReader();
         while (reader.Read())
-            list.Add(new ClientTotal
+            list.Add(new StoreTotal
             {
-                ClientName = reader.GetString(0), SalesCount = Convert.ToInt32(reader.GetInt64(1)),
+                StoreName = reader.GetString(0), SalesCount = Convert.ToInt32(reader.GetInt64(1)),
                 TotalSum = reader.GetDecimal(2)
+            });
+        return list;
+    }
+
+    public static List<Store> GetStores()
+    {
+        var list = new List<Store>();
+        using var connection = CreateConnection();
+        using var command = new NpgsqlCommand(
+            "SELECT id, name, address, phone, working_hours FROM store ORDER BY name", connection);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            list.Add(new Store
+            {
+                Id = reader.GetInt32(0), Name = reader.GetString(1), Address = reader.GetString(2),
+                Phone = reader.IsDBNull(3) ? null : reader.GetString(3),
+                WorkingHours = reader.IsDBNull(4) ? null : reader.GetString(4)
             });
         return list;
     }

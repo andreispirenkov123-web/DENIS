@@ -15,8 +15,7 @@ public partial class DashboardPage : Page
     {
         if (FindParent<Button>(e.OriginalSource as DependencyObject) != null) return;
         if ((sender as FrameworkElement)?.DataContext is not Product product) return;
-        var window = new ProductDetailWindow(product) { Owner = Window.GetWindow(this) };
-        window.ShowDialog();
+        (Application.Current.MainWindow?.DataContext as MainWindowViewModel)?.ShowProduct(product);
     }
 
     private static T? FindParent<T>(DependencyObject? source) where T : DependencyObject

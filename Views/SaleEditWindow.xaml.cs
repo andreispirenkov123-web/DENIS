@@ -19,7 +19,7 @@ public partial class SaleEditWindow : Window
         _sale = sale ?? new Sale();
         TitleText.Text = sale == null ? "Оформление продажи" : $"Продажа №{_sale.Id}";
 
-        ClientBox.ItemsSource = Database.GetClients();
+        StoreBox.ItemsSource = Database.GetStores();
         ManagerBox.ItemsSource = Database.GetUsers().Where(u => u.RoleId is 1 or 2).ToList();
         SaleDateBox.SelectedDate = DateTime.Today;
         StatusBox.SelectedIndex = 0;
@@ -28,7 +28,7 @@ public partial class SaleEditWindow : Window
 
         if (sale == null) return;
 
-        ClientBox.SelectedItem = ((List<Client>)ClientBox.ItemsSource).FirstOrDefault(c => c.Id == _sale.ClientId);
+        StoreBox.SelectedItem = ((List<Store>)StoreBox.ItemsSource).FirstOrDefault(s => s.Id == _sale.PickupStoreId);
         ManagerBox.SelectedItem = ((List<AppUser>)ManagerBox.ItemsSource).FirstOrDefault(u => u.Id == _sale.ManagerId);
         SaleDateBox.SelectedDate = _sale.SaleDate;
         DiscountBox.Text = _sale.Discount.ToString("0.00");
@@ -116,9 +116,9 @@ public partial class SaleEditWindow : Window
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         ErrorText.Text = string.Empty;
-        if (ClientBox.SelectedItem is not Client client || ManagerBox.SelectedItem is not AppUser manager)
+        if (StoreBox.SelectedItem is not Store store || ManagerBox.SelectedItem is not AppUser manager)
         {
-            ErrorText.Text = "Выберите клиента и менеджера.";
+            ErrorText.Text = "Выберите магазин самовывоза и менеджера.";
             return;
         }
         if (_items.Count == 0)
@@ -126,7 +126,7 @@ public partial class SaleEditWindow : Window
             ErrorText.Text = "Добавьте хотя бы один товар.";
             return;
         }
-        _sale.ClientId = client.Id;
+        _sale.PickupStoreId = store.Id;
         _sale.ManagerId = manager.Id;
         _sale.SaleDate = SaleDateBox.SelectedDate ?? DateTime.Today;
         _sale.Discount = DiscountValue;

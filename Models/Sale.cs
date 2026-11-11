@@ -4,8 +4,8 @@ namespace HouseholdGoodsIS.Models;
 public class Sale
 {
     public int Id { get; set; }
-    public int ClientId { get; set; }
-    public string ClientName { get; set; } = string.Empty;
+    public int PickupStoreId { get; set; }
+    public string StoreName { get; set; } = string.Empty;
     public int ManagerId { get; set; }
     public string ManagerName { get; set; } = string.Empty;
     public DateTime SaleDate { get; set; }

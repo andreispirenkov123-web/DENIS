@@ -9,7 +9,7 @@ namespace HouseholdGoodsIS.ViewModels;
 public class CartViewModel : PageViewModelBase
 {
     private readonly IDialogService _dialogService;
-    private Client? _selectedClient;
+    private Store? _selectedStore;
     private int _selectedPaymentIndex;
 
     public CartViewModel()
@@ -23,7 +23,7 @@ public class CartViewModel : PageViewModelBase
         ClearCommand = new RelayCommand(_ => CartService.Instance.Clear());
         CheckoutCommand = new RelayCommand(_ => Checkout());
         ContinueCommand = new RelayCommand(_ => NavigateCatalog());
-        Clients = new ObservableCollection<Client>();
+        Stores = new ObservableCollection<Store>();
         PaymentMethods = new ObservableCollection<string> { "Карта", "СБП", "Наличные" };
         SelectedPaymentIndex = 0;
         CartService.Instance.Changed += (_, _) => UpdateSummary();
@@ -31,14 +31,18 @@ public class CartViewModel : PageViewModelBase
     }
 
     public ObservableCollection<CartItem> Items => CartService.Instance.Items;
-    public ObservableCollection<Client> Clients { get; }
+    public ObservableCollection<Store> Stores { get; }
     public ObservableCollection<string> PaymentMethods { get; }
 
-    public Client? SelectedClient
+    public Store? SelectedStore
     {
-        get => _selectedClient;
-        set => SetProperty(ref _selectedClient, value);
+        get => _selectedStore;
+        set => SetProperty(ref _selectedStore, value);
     }
+
+    public string? SelectedStoreInfo => SelectedStore == null
+        ? null
+        : $"{SelectedStore.Address} · {SelectedStore.WorkingHours}";
 
     public int SelectedPaymentIndex
     {
@@ -70,22 +74,22 @@ public class CartViewModel : PageViewModelBase
 
     public override void Refresh()
     {
-        LoadClients();
+        LoadStores();
         UpdateSummary();
     }
 
-    private void LoadClients()
+    private void LoadStores()
     {
         try
         {
-            var list = Database.GetClients();
-            Clients.Clear();
-            foreach (var client in list) Clients.Add(client);
-            if (SelectedClient == null && Clients.Count > 0) SelectedClient = Clients[0];
+            var list = Database.GetStores();
+            Stores.Clear();
+            foreach (var store in list) Stores.Add(store);
+            if (SelectedStore == null && Stores.Count > 0) SelectedStore = Stores[0];
         }
         catch (Exception ex)
         {
-            _dialogService.ShowDialog("Не удалось загрузить клиентов.\n" + ex.Message,
+            _dialogService.ShowDialog("Не удалось загрузить магазины.\n" + ex.Message,
                 "Ошибка", DialogType.Error);
         }
     }
@@ -96,7 +100,7 @@ public class CartViewModel : PageViewModelBase
         OnPropertyChanged(nameof(IsEmpty));
         OnPropertyChanged(nameof(TotalText));
         OnPropertyChanged(nameof(CountText));
-        if (Clients.Count == 0) LoadClients();
+        if (Stores.Count == 0) LoadStores();
     }
 
     private void Checkout()
@@ -107,15 +111,15 @@ public class CartViewModel : PageViewModelBase
                 "Корзина", DialogType.Error);
             return;
         }
-        if (SelectedClient == null)
+        if (SelectedStore == null)
         {
-            _dialogService.ShowDialog("Выберите покупателя.", "Оформление заказа", DialogType.Error);
+            _dialogService.ShowDialog("Выберите магазин самовывоза.", "Оформление заказа", DialogType.Error);
             return;
         }
 
         var sale = new Sale
         {
-            ClientId = SelectedClient.Id,
+            PickupStoreId = SelectedStore.Id,
             ManagerId = AuthorizationViewModel.CurrentUser?.Id ?? 1,
             SaleDate = DateTime.Today,
             Status = "Оплачена",

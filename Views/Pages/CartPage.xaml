@@ -116,16 +116,18 @@
                                    Foreground="{StaticResource TextBrush}"
                                    HorizontalAlignment="Right" />
                     </Grid>
-                    <TextBlock Text="Покупатель" Style="{StaticResource SecondaryText}" Margin="0,18,0,4" />
-                    <ComboBox ItemsSource="{Binding Clients}" DisplayMemberPath="FullName"
-                              SelectedItem="{Binding SelectedClient}" />
+                    <TextBlock Text="Магазин самовывоза" Style="{StaticResource SecondaryText}" Margin="0,18,0,4" />
+                    <ComboBox ItemsSource="{Binding Stores}" DisplayMemberPath="DisplayName"
+                              SelectedItem="{Binding SelectedStore}" />
+                    <TextBlock Text="{Binding SelectedStoreInfo}" Style="{StaticResource SecondaryText}"
+                               FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0" />
                     <TextBlock Text="Способ оплаты" Style="{StaticResource SecondaryText}" Margin="0,12,0,4" />
                     <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedIndex="{Binding SelectedPaymentIndex}" />
                     <Button Content="Оформить заказ" Height="42" Margin="0,20,0,0" FontSize="15" FontWeight="SemiBold"
                             Style="{StaticResource PrimaryButton}" Command="{Binding CheckoutCommand}" />
                     <Button Content="Продолжить покупки" Margin="0,10,0,0" Style="{StaticResource LinkButton}"
                             Command="{Binding ContinueCommand}" />
-                    <TextBlock Text="После оформления заказа создаётся продажа и платёж в базе данных."
+                    <TextBlock Text="После оформления заказа создаётся продажа и платёж, выбирается магазин самовывоза."
                                Style="{StaticResource SecondaryText}" FontSize="11" TextWrapping="Wrap"
                                Margin="0,12,0,0" />
                 </StackPanel>

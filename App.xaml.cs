@@ -68,7 +68,7 @@ public partial class App : Application
 
             var sale = new Models.Sale
             {
-                ClientId = Data.Database.GetClients().First().Id,
+                PickupStoreId = Data.Database.GetStores().First().Id,
                 ManagerId = admin.Id,
                 SaleDate = DateTime.Today,
                 Status = "Оплачена",
