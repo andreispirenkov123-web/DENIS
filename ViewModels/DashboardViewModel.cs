@@ -7,17 +7,29 @@ namespace HouseholdGoodsIS.ViewModels;
 public class DashboardViewModel : PageViewModelBase
 {
     private readonly IDialogService _dialogService;
+    private List<Category> _categories = new();
+    private List<Product> _popularProducts = new();
     private DashboardStats _stats = new();
-    private List<StatusCount> _statusCounts = new();
-    private List<Product> _lowStock = new();
-    private List<Sale> _recentSales = new();
 
     public DashboardViewModel()
     {
         Title = "Главная";
         Glyph = "\uE80F";
         _dialogService = ServiceContainer.Instance.Get<IDialogService>();
+        AddToCartCommand = new RelayCommand(parameter => AddToCart(parameter as Product));
         Load();
+    }
+
+    public List<Category> Categories
+    {
+        get => _categories;
+        private set => SetProperty(ref _categories, value);
+    }
+
+    public List<Product> PopularProducts
+    {
+        get => _popularProducts;
+        private set => SetProperty(ref _popularProducts, value);
     }
 
     public DashboardStats Stats
@@ -26,23 +38,7 @@ public class DashboardViewModel : PageViewModelBase
         private set => SetProperty(ref _stats, value);
     }
 
-    public List<StatusCount> StatusCounts
-    {
-        get => _statusCounts;
-        private set => SetProperty(ref _statusCounts, value);
-    }
-
-    public List<Product> LowStock
-    {
-        get => _lowStock;
-        private set => SetProperty(ref _lowStock, value);
-    }
-
-    public List<Sale> RecentSales
-    {
-        get => _recentSales;
-        private set => SetProperty(ref _recentSales, value);
-    }
+    public RelayCommand AddToCartCommand { get; }
 
     public override void Refresh() => Load();
 
@@ -50,15 +46,26 @@ public class DashboardViewModel : PageViewModelBase
     {
         try
         {
+            Categories = Database.GetCategoriesWithCounts();
+            PopularProducts = Database.GetPopularProducts(8);
             Stats = Database.GetDashboardStats();
-            StatusCounts = Database.GetSalesByStatus();
-            LowStock = Database.GetLowStock(5);
-            RecentSales = Database.GetRecentSales(5);
         }
         catch (Exception ex)
         {
-            _dialogService.ShowDialog("Не удалось загрузить показатели.\n" + ex.Message,
+            _dialogService.ShowDialog("Не удалось загрузить главную страницу.\n" + ex.Message,
                 "Ошибка чтения данных", DialogType.Error);
+        }
+    }
+
+    private void AddToCart(Product? product)
+    {
+        if (product == null) return;
+        if (!CartService.Instance.Add(product))
+        {
+            _dialogService.ShowDialog(product.Stock <= 0
+                    ? "Товара нет в наличии."
+                    : $"На складе только {product.Stock} шт. Больше добавить нельзя.",
+                "Корзина", DialogType.Error);
         }
     }
 }

@@ -77,6 +77,8 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="16" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <StackPanel>
                 <TextBlock Text="Закупочная цена, ₽ *" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />
@@ -85,6 +87,10 @@
             <StackPanel Grid.Column="2">
                 <TextBlock Text="Розничная цена, ₽ *" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />
                 <TextBox x:Name="RetailBox" Style="{StaticResource InputTextBox}" />
+            </StackPanel>
+            <StackPanel Grid.Column="4">
+                <TextBlock Text="Старая цена, ₽" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />
+                <TextBox x:Name="OldPriceBox" Style="{StaticResource InputTextBox}" />
             </StackPanel>
         </Grid>
 

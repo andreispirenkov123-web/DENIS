@@ -10,30 +10,33 @@ public class ProductsViewModel : PageViewModelBase
     private readonly IDialogService _dialogService;
     private readonly IEditorService _editorService;
     private string _searchText = string.Empty;
-    private string _selectedCategory = "Все категории";
+    private Category? _selectedCategoryItem;
     private int _selectedSortIndex;
     private Product? _selectedProduct;
 
     public ProductsViewModel()
     {
-        Title = "Товары";
+        Title = "Каталог";
         Glyph = "\uE719";
         _dialogService = ServiceContainer.Instance.Get<IDialogService>();
         _editorService = ServiceContainer.Instance.Get<IEditorService>();
         AddCommand = new RelayCommand(_ => AddProduct());
-        EditCommand = new RelayCommand(_ => EditProduct(), _ => SelectedProduct != null);
-        DeleteCommand = new RelayCommand(_ => DeleteProduct(), _ => SelectedProduct != null);
-        RefreshCommand = new RelayCommand(_ => Load());
+        EditCommand = new RelayCommand(_ => EditSelected(), _ => SelectedProduct != null);
+        DeleteCommand = new RelayCommand(_ => DeleteSelected(), _ => SelectedProduct != null);
+        RefreshCommand = new RelayCommand(_ => Refresh());
+        AddToCartCommand = new RelayCommand(parameter => AddToCart(parameter as Product));
+        EditProductCommand = new RelayCommand(parameter => EditProduct(parameter as Product));
+        DeleteProductCommand = new RelayCommand(parameter => DeleteProduct(parameter as Product));
         LoadCategories();
         Load();
     }
 
     public ObservableCollection<Product> Products { get; } = new();
-    public ObservableCollection<string> Categories { get; } = new() { "Все категории" };
+    public ObservableCollection<Category> Categories { get; } = new();
     public ObservableCollection<string> Sorts { get; } = new()
     {
-        "По названию (А–Я)", "По цене (возрастание)", "По цене (убывание)",
-        "По остатку (возрастание)", "По названию (Я–А)"
+        "По популярности", "По цене (возрастание)", "По цене (убывание)",
+        "По остатку (возрастание)", "По названию (А–Я)"
     };
 
     public string SearchText
@@ -42,10 +45,10 @@ public class ProductsViewModel : PageViewModelBase
         set { if (SetProperty(ref _searchText, value)) Load(); }
     }
 
-    public string SelectedCategory
+    public Category? SelectedCategoryItem
     {
-        get => _selectedCategory;
-        set { if (SetProperty(ref _selectedCategory, value)) Load(); }
+        get => _selectedCategoryItem;
+        set { if (SetProperty(ref _selectedCategoryItem, value)) Load(); }
     }
 
     public int SelectedSortIndex
@@ -66,6 +69,9 @@ public class ProductsViewModel : PageViewModelBase
     public RelayCommand EditCommand { get; }
     public RelayCommand DeleteCommand { get; }
     public RelayCommand RefreshCommand { get; }
+    public RelayCommand AddToCartCommand { get; }
+    public RelayCommand EditProductCommand { get; }
+    public RelayCommand DeleteProductCommand { get; }
 
     public override void Refresh()
     {
@@ -73,15 +79,26 @@ public class ProductsViewModel : PageViewModelBase
         Load();
     }
 
+    public void SetCategory(string? categoryName)
+    {
+        var target = string.IsNullOrWhiteSpace(categoryName)
+            ? null
+            : Categories.FirstOrDefault(c => c.Name == categoryName);
+        SetProperty(ref _selectedCategoryItem, target, nameof(SelectedCategoryItem));
+    }
+
     private void LoadCategories()
     {
         try
         {
-            var saved = SelectedCategory;
+            var selected = SelectedCategoryItem?.Name;
             Categories.Clear();
-            Categories.Add("Все категории");
-            foreach (var category in Database.GetCategories()) Categories.Add(category.Name);
-            SelectedCategory = Categories.Contains(saved) ? saved : "Все категории";
+            var categories = Database.GetCategoriesWithCounts();
+            Categories.Add(new Category { Id = 0, Name = "Все категории",
+                ProductCount = categories.Sum(c => c.ProductCount) });
+            foreach (var category in categories) Categories.Add(category);
+            SelectedCategoryItem = Categories.FirstOrDefault(c => c.Name == selected)
+                                   ?? Categories.FirstOrDefault();
         }
         catch
         {
@@ -93,7 +110,7 @@ public class ProductsViewModel : PageViewModelBase
     {
         try
         {
-            var category = SelectedCategory == "Все категории" ? string.Empty : SelectedCategory;
+            var category = SelectedCategoryItem is { Id: > 0 } ? SelectedCategoryItem.Name : string.Empty;
             var list = Database.GetProducts(SearchText, category, SelectedSortIndex);
             Products.Clear();
             foreach (var product in list) Products.Add(product);
@@ -101,7 +118,7 @@ public class ProductsViewModel : PageViewModelBase
         }
         catch (Exception ex)
         {
-            _dialogService.ShowDialog("Не удалось загрузить список товаров.\n" + ex.Message,
+            _dialogService.ShowDialog("Не удалось загрузить каталог товаров.\n" + ex.Message,
                 "Ошибка чтения данных", DialogType.Error);
         }
     }
@@ -115,27 +132,54 @@ public class ProductsViewModel : PageViewModelBase
         }
     }
 
-    private void EditProduct()
+    private void EditSelected()
     {
-        if (SelectedProduct == null) return;
-        if (_editorService.EditProduct(SelectedProduct)) Load();
+        if (SelectedProduct != null) EditProduct(SelectedProduct);
     }
 
-    private void DeleteProduct()
+    private void DeleteSelected()
     {
-        if (SelectedProduct == null) return;
-        var result = _dialogService.ShowDialog(
-            $"Удалить товар «{SelectedProduct.Name}»?", "Подтверждение удаления", DialogType.Question);
+        if (SelectedProduct != null) DeleteProduct(SelectedProduct);
+    }
+
+    private void EditProduct(Product? product)
+    {
+        if (product == null) return;
+        if (_editorService.EditProduct(product))
+        {
+            LoadCategories();
+            Load();
+        }
+    }
+
+    private void DeleteProduct(Product? product)
+    {
+        if (product == null) return;
+        var result = _dialogService.ShowDialog($"Удалить товар «{product.Name}»?",
+            "Подтверждение удаления", DialogType.Question);
         if (result != DialogResult.Yes) return;
         try
         {
-            Database.DeleteProduct(SelectedProduct.Id);
+            Database.DeleteProduct(product.Id);
+            LoadCategories();
             Load();
         }
         catch (Exception ex)
         {
             _dialogService.ShowDialog("Не удалось удалить товар. Возможно, он используется в продажах или поставках.\n"
                                       + ex.Message, "Ошибка удаления", DialogType.Error);
+        }
+    }
+
+    private void AddToCart(Product? product)
+    {
+        if (product == null) return;
+        if (!CartService.Instance.Add(product))
+        {
+            _dialogService.ShowDialog(product.Stock <= 0
+                    ? "Товара нет в наличии."
+                    : $"На складе только {product.Stock} шт. Больше добавить нельзя.",
+                "Корзина", DialogType.Error);
         }
     }
 }

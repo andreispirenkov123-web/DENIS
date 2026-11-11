@@ -3,108 +3,125 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:HouseholdGoodsIS.ViewModels"
         xmlns:pages="clr-namespace:HouseholdGoodsIS.Views.Pages"
-        Title="Бытовые товары — учёт и продажи бытовой техники"
-        Height="880" Width="1440" MinHeight="720" MinWidth="1100"
+        Title="Бытовые товары — магазин бытовой техники"
+        Height="900" Width="1440" MinHeight="720" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
         Icon="pack://application:,,,/Resources/Icons/app.ico">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><pages:DashboardPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:ProductsViewModel}"><pages:ProductsPage /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CartViewModel}"><pages:CartPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:SalesViewModel}"><pages:SalesPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:ClientsViewModel}"><pages:ClientsPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:SuppliesViewModel}"><pages:SuppliesPage /></DataTemplate>
-        <DataTemplate DataType="{x:Type vm:ReferencesViewModel}"><pages:ReferencesPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:UsersViewModel}"><pages:UsersPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:ReportsViewModel}"><pages:ReportsPage /></DataTemplate>
     </Window.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="260" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="76" />
+            <RowDefinition Height="46" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}"
-                BorderThickness="0,0,1,0">
-            <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="18,20,16,16">
-                    <Image Source="pack://application:,,,/Resources/Images/logo_icon.png" Width="38" Height="38" />
+        <!-- Верхняя панель -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,0,0,1" Padding="22,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="pack://application:,,,/Resources/Images/logo_icon.png" Width="42" Height="42" />
                     <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="Бытовые товары" FontSize="15" FontWeight="SemiBold" />
-                        <TextBlock Text="HouseholdGoodsIS" Style="{StaticResource SecondaryText}" FontSize="11" />
+                        <TextBlock Text="Бытовые товары" FontSize="19" FontWeight="Bold" />
+                        <TextBlock Text="магазин техники для дома" Style="{StaticResource SecondaryText}" FontSize="11" />
                     </StackPanel>
                 </StackPanel>
 
-                <Border DockPanel.Dock="Bottom" BorderBrush="{StaticResource BorderBrush}"
-                        BorderThickness="0,1,0,0" Padding="14,12">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Border Width="34" Height="34" CornerRadius="17">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                    <Border Width="470" Height="40" Background="{StaticResource BackgroundBrush}"
+                            BorderBrush="{StaticResource BorderStrongBrush}" BorderThickness="1" CornerRadius="4">
+                        <Grid>
+                            <TextBox x:Name="SearchBox" Background="Transparent" BorderThickness="0"
+                                     VerticalContentAlignment="Center" Padding="12,0" FontSize="14"
+                                     Text="{Binding GlobalSearch, UpdateSourceTrigger=PropertyChanged}"
+                                     KeyDown="SearchBox_KeyDown" />
+                            <TextBlock Text="Поиск товаров" Foreground="{StaticResource SecondaryTextBrush}"
+                                       VerticalAlignment="Center" Margin="14,0,0,0" IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding GlobalSearch}" Value="">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+                    <Button Content="Найти" Width="92" Height="40" Margin="8,0,0,0"
+                            Style="{StaticResource PrimaryButton}" Click="SearchButton_Click" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="8-800-77-07-999" Style="{StaticResource SecondaryText}" FontSize="12"
+                               VerticalAlignment="Center" Margin="0,0,18,0" />
+                    <Button Style="{StaticResource LinkButton}" Click="CartButton_Click" Padding="8,4"
+                            Margin="0,0,14,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="18" VerticalAlignment="Center" />
+                            <TextBlock Text="Корзина" FontSize="13" Margin="7,0,6,0" VerticalAlignment="Center" />
+                            <Border Background="{StaticResource AccentBrush}" CornerRadius="9" Padding="7,1"
+                                    Visibility="{Binding HasCartItems, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="{Binding CartCountText}" FontSize="11" FontWeight="Bold" />
+                            </Border>
+                        </StackPanel>
+                    </Button>
+                    <Button Content="Сменить пароль" Style="{StaticResource LinkButton}" FontSize="12"
+                            Margin="0,0,10,0" Click="ChangePassword_Click" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                        <Border Width="30" Height="30" CornerRadius="15">
                             <Border.Background>
                                 <ImageBrush ImageSource="{Binding AvatarPath, Converter={StaticResource ImageConverter}}"
                                             Stretch="UniformToFill" />
                             </Border.Background>
                         </Border>
-                        <StackPanel Grid.Column="1" Margin="9,0,4,0" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding UserFullName}" FontSize="12" FontWeight="SemiBold"
-                                       TextTrimming="CharacterEllipsis" />
-                            <TextBlock Text="{Binding RoleName}" Style="{StaticResource SecondaryText}" FontSize="11" />
+                        <StackPanel Margin="8,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding UserFullName}" FontSize="11" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding RoleName}" Style="{StaticResource SecondaryText}" FontSize="10" />
                         </StackPanel>
-                        <Button Grid.Column="2" ToolTip="Выйти" Style="{StaticResource IconButton}"
-                                Click="LogoutButton_Click">
-                            <TextBlock Text="&#xE7E8;" FontFamily="Segoe MDL2 Assets" FontSize="16" />
-                        </Button>
-                    </Grid>
-                </Border>
-
-                <ListBox Style="{StaticResource NavListBox}"
-                         ItemContainerStyle="{StaticResource NavListBoxItem}"
-                         ItemsSource="{Binding Pages}"
-                         SelectedItem="{Binding SelectedPage}"
-                         Margin="0,4">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Glyph}" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="16" VerticalAlignment="Center"
-                                           Foreground="{Binding Foreground,
-                                               RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
-                                <TextBlock Text="{Binding Title}" Margin="12,0,0,0" VerticalAlignment="Center"
-                                           Foreground="{Binding Foreground,
-                                               RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </DockPanel>
+                    </StackPanel>
+                    <Button ToolTip="Выйти" Style="{StaticResource IconButton}" Click="LogoutButton_Click">
+                        <TextBlock Text="&#xE7E8;" FontFamily="Segoe MDL2 Assets" FontSize="16" />
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <!-- Меню категорий -->
+        <Border Grid.Row="1" Background="#FF1F1F1F">
+            <ListBox Style="{StaticResource TopNavListBox}" ItemContainerStyle="{StaticResource TopNavItem}"
+                     ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Title}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
 
-            <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}"
-                    BorderThickness="0,0,0,1" Padding="24,12">
-                <Grid>
-                    <TextBlock Text="{Binding PageTitle}" FontSize="20" FontWeight="SemiBold"
-                               VerticalAlignment="Center" />
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Button Content="Сменить пароль" Style="{StaticResource LinkButton}"
-                                Margin="0,0,12,0" Click="ChangePassword_Click" />
-                        <TextBlock Text="{Binding UserChip}" Style="{StaticResource SecondaryText}"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
-                </Grid>
-            </Border>
-
-            <Frame Grid.Row="1" NavigationUIVisibility="Hidden"
-                   Content="{Binding SelectedPage}" Background="Transparent" />
-        </Grid>
+        <Frame Grid.Row="2" NavigationUIVisibility="Hidden"
+               Content="{Binding SelectedPage}" Background="Transparent" />
     </Grid>
 </Window>

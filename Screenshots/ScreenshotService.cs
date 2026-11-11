@@ -54,23 +54,33 @@ public static class ScreenshotService
         CaptureWindow(new Dialog("Вы ввели неверный логин или пароль. Пожалуйста, проверьте ещё раз введённые данные.",
                 "Ошибка авторизации", DialogType.Error),
             Path.Combine(directory, "04_dialog_error.png"));
-        CaptureWindow(new Dialog("Удалить выбранную запись из базы данных?",
+        CaptureWindow(new Dialog("Удалить выбранный товар из каталога?",
                 "Подтверждение действия", DialogType.Question),
             Path.Combine(directory, "10_dialog_question.png"));
 
-        CaptureMain(admin, 1, 0, Path.Combine(directory, "05_main_admin_products_cards.png"));
-        CaptureMain(admin, 1, 1, Path.Combine(directory, "06_main_admin_products_table.png"));
-        CaptureMain(admin, 2, 0, Path.Combine(directory, "07_main_admin_sales.png"));
-        CaptureMain(admin, 3, 0, Path.Combine(directory, "08_main_admin_clients.png"));
-        CaptureMain(admin, 0, 0, Path.Combine(directory, "11_dashboard.png"));
+        // товары в корзине для наглядного скриншота
+        var products = Database.GetProducts();
+        if (products.Count >= 2)
+        {
+            CartService.Instance.Add(products[0], 1);
+            CartService.Instance.Add(products[1], 1);
+        }
+
+        CaptureMain(admin, 0, 0, Path.Combine(directory, "11_home.png"));
+        CaptureMain(admin, 1, 0, Path.Combine(directory, "05_catalog_cards.png"));
+        CaptureMain(admin, 1, 1, Path.Combine(directory, "06_catalog_list.png"));
+        CaptureMain(admin, 3, 0, Path.Combine(directory, "07_orders.png"));
+        CaptureMain(admin, 4, 0, Path.Combine(directory, "08_clients.png"));
+        CaptureMain(admin, 2, 0, Path.Combine(directory, "13_cart.png"));
         CaptureMain(admin, 6, 0, Path.Combine(directory, "12_users.png"));
-        CaptureMain(admin, 5, 0, Path.Combine(directory, "13_references.png"));
         CaptureMain(admin, 7, 0, Path.Combine(directory, "14_reports.png"));
-        CaptureMain(manager, 1, 0, Path.Combine(directory, "09_main_manager.png"));
+        CaptureMain(manager, 1, 0, Path.Combine(directory, "09_manager_catalog.png"));
+
+        CartService.Instance.Clear();
 
         var product = Database.GetProducts().FirstOrDefault();
         if (product != null)
-            CaptureWindow(new ProductEditWindow(product) { Width = 640 }, Path.Combine(directory, "15_product_edit.png"));
+            CaptureWindow(new ProductEditWindow(product) { Width = 660 }, Path.Combine(directory, "15_product_edit.png"));
         var sale = Database.GetSales().FirstOrDefault();
         if (sale != null)
             CaptureWindow(new SaleEditWindow(sale) { Width = 820, Height = 720 },
@@ -85,7 +95,7 @@ public static class ScreenshotService
 
     private static void CaptureMain(AppUser account, int pageIndex, int tabIndex, string path)
     {
-        var window = new MainWindow(account) { Width = 1440, Height = 880 };
+        var window = new MainWindow(account) { Width = 1440, Height = 900 };
         window.WindowStartupLocation = WindowStartupLocation.Manual;
         window.Left = 20;
         window.Top = 20;

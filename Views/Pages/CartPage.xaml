@@ -1,0 +1,135 @@
+<Page x:Class="HouseholdGoodsIS.Views.Pages.CartPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Корзина" Background="Transparent">
+    <Grid Margin="24,16,24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,14">
+            <StackPanel>
+                <TextBlock Text="Корзина" Style="{StaticResource PageTitleText}" />
+                <TextBlock Text="{Binding CountText}" Style="{StaticResource SecondaryText}" Margin="0,2,0,0" />
+            </StackPanel>
+            <Button Content="Очистить корзину" HorizontalAlignment="Right" VerticalAlignment="Center"
+                    Style="{StaticResource SecondaryButton}" Command="{Binding ClearCommand}"
+                    Visibility="{Binding HasItems, Converter={StaticResource BoolToVisibility}}" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="340" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" Margin="0,0,16,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Visibility="{Binding HasItems, Converter={StaticResource BoolToVisibility}}">
+                    <ItemsControl ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="96" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="86" Height="86" CornerRadius="4">
+                                            <Border.Background>
+                                                <ImageBrush Stretch="Uniform" ImageSource="{Binding ImagePath,
+                                                    Converter={StaticResource ImageConverter}}" />
+                                            </Border.Background>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="12,0,12,0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Sku}" Style="{StaticResource SecondaryText}"
+                                                       FontSize="11" Margin="0,2,0,8" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="−" Width="30" Height="30" FontSize="17" Padding="0"
+                                                        Style="{StaticResource SecondaryButton}"
+                                                        Command="{Binding DataContext.DecreaseCommand,
+                                                            RelativeSource={RelativeSource AncestorType=Page}}"
+                                                        CommandParameter="{Binding}" />
+                                                <TextBlock Text="{Binding Quantity}" FontSize="15" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource TextBrush}"
+                                                           Width="42" TextAlignment="Center" VerticalAlignment="Center" />
+                                                <Button Content="+" Width="30" Height="30" FontSize="17" Padding="0"
+                                                        Style="{StaticResource SecondaryButton}"
+                                                        Command="{Binding DataContext.IncreaseCommand,
+                                                            RelativeSource={RelativeSource AncestorType=Page}}"
+                                                        CommandParameter="{Binding}" />
+                                                <TextBlock Text="{Binding PriceText}" Style="{StaticResource SecondaryText}"
+                                                           VerticalAlignment="Center" Margin="14,0,0,0" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                            <TextBlock Text="{Binding SumText}" FontSize="18" FontWeight="Bold"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       HorizontalAlignment="Right" />
+                                            <Button Style="{StaticResource IconButton}" HorizontalAlignment="Right"
+                                                    Margin="0,6,0,0" ToolTip="Удалить из корзины"
+                                                    Command="{Binding DataContext.RemoveCommand,
+                                                        RelativeSource={RelativeSource AncestorType=Page}}"
+                                                    CommandParameter="{Binding}">
+                                                <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <Border Style="{StaticResource CardBorder}" Padding="30"
+                        Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="54"
+                                   Foreground="{StaticResource BorderStrongBrush}" HorizontalAlignment="Center" />
+                        <TextBlock Text="Корзина пуста" FontSize="22" FontWeight="SemiBold" Margin="0,14,0,4"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="Добавьте товары из каталога, чтобы оформить заказ"
+                                   Style="{StaticResource SecondaryText}" HorizontalAlignment="Center" />
+                        <Button Content="Перейти в каталог" Width="220" Height="38" Margin="0,18,0,0"
+                                Style="{StaticResource PrimaryButton}" Command="{Binding ContinueCommand}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border Grid.Column="1" Style="{StaticResource CardBorder}" Padding="20" VerticalAlignment="Top"
+                    Visibility="{Binding HasItems, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel>
+                    <TextBlock Text="Ваш заказ" Style="{StaticResource SectionTitleText}" FontSize="18" />
+                    <Grid Margin="0,16,0,0">
+                        <TextBlock Text="Товары" Style="{StaticResource SecondaryText}" />
+                        <TextBlock Text="{Binding CountText}" HorizontalAlignment="Right" FontSize="13" />
+                    </Grid>
+                    <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,12" />
+                    <Grid>
+                        <TextBlock Text="Итого" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding TotalText}" FontSize="26" FontWeight="Bold"
+                                   Foreground="{StaticResource TextBrush}"
+                                   HorizontalAlignment="Right" />
+                    </Grid>
+                    <TextBlock Text="Покупатель" Style="{StaticResource SecondaryText}" Margin="0,18,0,4" />
+                    <ComboBox ItemsSource="{Binding Clients}" DisplayMemberPath="FullName"
+                              SelectedItem="{Binding SelectedClient}" />
+                    <TextBlock Text="Способ оплаты" Style="{StaticResource SecondaryText}" Margin="0,12,0,4" />
+                    <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedIndex="{Binding SelectedPaymentIndex}" />
+                    <Button Content="Оформить заказ" Height="42" Margin="0,20,0,0" FontSize="15" FontWeight="SemiBold"
+                            Style="{StaticResource PrimaryButton}" Command="{Binding CheckoutCommand}" />
+                    <Button Content="Продолжить покупки" Margin="0,10,0,0" Style="{StaticResource LinkButton}"
+                            Command="{Binding ContinueCommand}" />
+                    <TextBlock Text="После оформления заказа создаётся продажа и платёж в базе данных."
+                               Style="{StaticResource SecondaryText}" FontSize="11" TextWrapping="Wrap"
+                               Margin="0,12,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

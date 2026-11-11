@@ -15,7 +15,7 @@ public class SalesViewModel : PageViewModelBase
 
     public SalesViewModel()
     {
-        Title = "Продажи";
+        Title = "Заказы";
         Glyph = "\uE7BF";
         _dialogService = ServiceContainer.Instance.Get<IDialogService>();
         _editorService = ServiceContainer.Instance.Get<IEditorService>();

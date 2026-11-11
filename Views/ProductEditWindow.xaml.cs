@@ -30,6 +30,7 @@ public partial class ProductEditWindow : Window
         ModelBox.Text = _product.Model;
         PurchaseBox.Text = _product.PurchasePrice.ToString("0.00");
         RetailBox.Text = _product.RetailPrice.ToString("0.00");
+        OldPriceBox.Text = _product.OldPrice?.ToString("0.00") ?? string.Empty;
         WarrantyBox.Text = _product.WarrantyMonths.ToString();
         DescriptionBox.Text = _product.Description ?? string.Empty;
         ImageBox.Text = _product.ImagePath ?? string.Empty;
@@ -87,6 +88,7 @@ public partial class ProductEditWindow : Window
         _product.Model = ModelBox.Text.Trim();
         _product.PurchasePrice = purchase;
         _product.RetailPrice = retail;
+        _product.OldPrice = string.IsNullOrWhiteSpace(OldPriceBox.Text) ? null : ParseMoney(OldPriceBox.Text);
         _product.WarrantyMonths = warranty;
         _product.Description = string.IsNullOrWhiteSpace(DescriptionBox.Text) ? null : DescriptionBox.Text.Trim();
         _product.ImagePath = string.IsNullOrWhiteSpace(ImageBox.Text) ? null : ImageBox.Text.Trim();

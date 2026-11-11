@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using HouseholdGoodsIS.Models;
 using HouseholdGoodsIS.Services;
 using HouseholdGoodsIS.ViewModels;
@@ -15,6 +16,16 @@ public partial class MainWindow : Window
     }
 
     public MainWindowViewModel ViewModel { get; }
+
+    private void SearchButton_Click(object sender, RoutedEventArgs e) =>
+        ViewModel.NavigateToCatalog(null, ViewModel.GlobalSearch);
+
+    private void SearchBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter) ViewModel.NavigateToCatalog(null, ViewModel.GlobalSearch);
+    }
+
+    private void CartButton_Click(object sender, RoutedEventArgs e) => ViewModel.NavigateToCart();
 
     private void ChangePassword_Click(object sender, RoutedEventArgs e)
     {

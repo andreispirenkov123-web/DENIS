@@ -194,7 +194,7 @@ public static class Database
         using var command = new NpgsqlCommand(
             $@"SELECT p.id, p.name, p.category_id, c.name, p.supplier_id, s.name, p.manufacturer,
                       p.model, p.sku, p.purchase_price, p.retail_price, p.warranty_months,
-                      p.description, p.image_path, p.is_active, COALESCE(ps.stock, 0)
+                      p.description, p.image_path, p.old_price, p.rating, p.reviews_count, p.is_active, COALESCE(ps.stock, 0)
                FROM product p
                JOIN category c ON c.id = p.category_id
                JOIN supplier s ON s.id = p.supplier_id
@@ -216,7 +216,7 @@ public static class Database
         using var command = new NpgsqlCommand(
             @"SELECT p.id, p.name, p.category_id, c.name, p.supplier_id, s.name, p.manufacturer,
                      p.model, p.sku, p.purchase_price, p.retail_price, p.warranty_months,
-                     p.description, p.image_path, p.is_active, COALESCE(ps.stock, 0)
+                     p.description, p.image_path, p.old_price, p.rating, p.reviews_count, p.is_active, COALESCE(ps.stock, 0)
               FROM product p
               JOIN category c ON c.id = p.category_id
               JOIN supplier s ON s.id = p.supplier_id
@@ -235,7 +235,9 @@ public static class Database
         RetailPrice = r.GetDecimal(10), WarrantyMonths = r.GetInt32(11),
         Description = r.IsDBNull(12) ? null : r.GetString(12),
         ImagePath = r.IsDBNull(13) ? null : r.GetString(13),
-        IsActive = r.GetBoolean(14), Stock = r.GetInt32(15)
+        OldPrice = r.IsDBNull(14) ? null : r.GetDecimal(14),
+        Rating = r.GetDecimal(15), ReviewsCount = r.GetInt32(16),
+        IsActive = r.GetBoolean(17), Stock = r.GetInt32(18)
     };
 
     public static int SaveProduct(Product p)
@@ -245,8 +247,8 @@ public static class Database
         {
             using var command = new NpgsqlCommand(
                 @"INSERT INTO product (name, category_id, supplier_id, manufacturer, model, sku,
-                                       purchase_price, retail_price, warranty_months, description, image_path, is_active)
-                  VALUES (@name,@cat,@sup,@man,@model,@sku,@purchase,@retail,@warranty,@desc,@image,@active)
+                                       purchase_price, retail_price, old_price, warranty_months, description, image_path, is_active)
+                  VALUES (@name,@cat,@sup,@man,@model,@sku,@purchase,@retail,@oldprice,@warranty,@desc,@image,@active)
                   RETURNING id", connection);
             AddProductParams(command, p);
             return Convert.ToInt32(command.ExecuteScalar());
@@ -254,7 +256,8 @@ public static class Database
         using (var command = new NpgsqlCommand(
                    @"UPDATE product SET name=@name, category_id=@cat, supplier_id=@sup, manufacturer=@man,
                           model=@model, sku=@sku, purchase_price=@purchase, retail_price=@retail,
-                          warranty_months=@warranty, description=@desc, image_path=@image, is_active=@active
+                          old_price=@oldprice, warranty_months=@warranty, description=@desc,
+                          image_path=@image, is_active=@active
                      WHERE id=@id", connection))
         {
             AddProductParams(command, p);
@@ -274,6 +277,7 @@ public static class Database
         command.Parameters.AddWithValue("sku", p.Sku);
         command.Parameters.AddWithValue("purchase", p.PurchasePrice);
         command.Parameters.AddWithValue("retail", p.RetailPrice);
+        command.Parameters.AddWithValue("oldprice", (object?)p.OldPrice ?? DBNull.Value);
         command.Parameters.AddWithValue("warranty", p.WarrantyMonths);
         command.Parameters.AddWithValue("desc", (object?)p.Description ?? DBNull.Value);
         command.Parameters.AddWithValue("image", (object?)p.ImagePath ?? DBNull.Value);
@@ -286,6 +290,46 @@ public static class Database
         using var command = new NpgsqlCommand("DELETE FROM product WHERE id=@id", connection);
         command.Parameters.AddWithValue("id", id);
         command.ExecuteNonQuery();
+    }
+
+    public static List<Category> GetCategoriesWithCounts()
+    {
+        var list = new List<Category>();
+        using var connection = CreateConnection();
+        using var command = new NpgsqlCommand(
+            @"SELECT c.id, c.name, c.description, count(p.id)
+              FROM category c LEFT JOIN product p ON p.category_id = c.id
+              GROUP BY c.id, c.name, c.description ORDER BY c.name", connection);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            list.Add(new Category
+            {
+                Id = reader.GetInt32(0), Name = reader.GetString(1),
+                Description = reader.IsDBNull(2) ? null : reader.GetString(2),
+                ProductCount = Convert.ToInt32(reader.GetInt64(3))
+            });
+        return list;
+    }
+
+    public static List<Product> GetPopularProducts(int count = 8)
+    {
+        var list = new List<Product>();
+        using var connection = CreateConnection();
+        using var command = new NpgsqlCommand(
+            @"SELECT p.id, p.name, p.category_id, c.name, p.supplier_id, s.name, p.manufacturer,
+                     p.model, p.sku, p.purchase_price, p.retail_price, p.warranty_months,
+                     p.description, p.image_path, p.old_price, p.rating, p.reviews_count,
+                     p.is_active, COALESCE(ps.stock, 0)
+              FROM product p
+              JOIN category c ON c.id = p.category_id
+              JOIN supplier s ON s.id = p.supplier_id
+              LEFT JOIN product_stock ps ON ps.product_id = p.id
+              WHERE p.is_active = true
+              ORDER BY p.rating DESC, p.reviews_count DESC LIMIT @count", connection);
+        command.Parameters.AddWithValue("count", count);
+        using var reader = command.ExecuteReader();
+        while (reader.Read()) list.Add(ReadProduct(reader));
+        return list;
     }
 
     public static int GetStock(int productId)
@@ -886,7 +930,7 @@ public static class Database
         using var command = new NpgsqlCommand(
             @"SELECT p.id, p.name, p.category_id, c.name, p.supplier_id, s.name, p.manufacturer,
                      p.model, p.sku, p.purchase_price, p.retail_price, p.warranty_months,
-                     p.description, p.image_path, p.is_active, COALESCE(ps.stock, 0)
+                     p.description, p.image_path, p.old_price, p.rating, p.reviews_count, p.is_active, COALESCE(ps.stock, 0)
               FROM product p
               JOIN category c ON c.id = p.category_id
               JOIN supplier s ON s.id = p.supplier_id
