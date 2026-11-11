@@ -24,6 +24,7 @@ public class Product
     public int WarrantyMonths { get; set; }
     public int MinStock { get; set; } = 2;
     public string? Description { get; set; }
+    public string? FullDescription { get; set; }
     public string? ImagePath { get; set; }
     public bool IsActive { get; set; }
     public int Stock { get; set; }

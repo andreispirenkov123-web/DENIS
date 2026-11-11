@@ -82,6 +82,9 @@ public static class ScreenshotService
         var product = Database.GetProducts().FirstOrDefault();
         if (product != null)
             CaptureWindow(new ProductEditWindow(product) { Width = 660 }, Path.Combine(directory, "15_product_edit.png"));
+            var detailProduct = Database.GetProducts().FirstOrDefault(p => p.Sku == "NB-001") ?? product;
+            CaptureWindow(new ProductDetailWindow(detailProduct) { Width = 920, Height = 720 },
+                Path.Combine(directory, "21_product_detail.png"));
             CaptureWindow(new StockAdjustmentWindow(product, false) { Width = 470 },
                 Path.Combine(directory, "20_stock_adjustment.png"));
         var sale = Database.GetSales().FirstOrDefault();

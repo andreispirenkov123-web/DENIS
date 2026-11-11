@@ -1,0 +1,101 @@
+﻿<Window x:Class="HouseholdGoodsIS.Views.ProductDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Карточка товара" Width="920" Height="720"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="360" />
+                    <ColumnDefinition Width="24" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Height="280" CornerRadius="8"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                    <Border.Background>
+                        <ImageBrush Stretch="Uniform" ImageSource="{Binding ImagePath,
+                            Converter={StaticResource ImageConverter}}" />
+                    </Border.Background>
+                </Border>
+                <StackPanel Grid.Column="2">
+                    <TextBlock x:Name="CategoryText" Style="{StaticResource SecondaryText}" FontSize="13" />
+                    <TextBlock x:Name="NameText" FontSize="25" FontWeight="Bold"
+                               Foreground="{StaticResource TextBrush}" TextWrapping="Wrap" Margin="0,4,0,10" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE735;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                   Foreground="{StaticResource AccentDarkBrush}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="RatingText" FontSize="15" FontWeight="SemiBold" Margin="5,0,4,0"
+                                   Foreground="{StaticResource TextBrush}" />
+                        <TextBlock x:Name="ReviewsText" Style="{StaticResource SecondaryText}" FontSize="13"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,4">
+                        <TextBlock x:Name="PriceText" FontSize="32" FontWeight="Bold"
+                                   Foreground="{StaticResource TextBrush}" />
+                        <TextBlock x:Name="OldPriceText" Style="{StaticResource SecondaryText}" FontSize="15"
+                                   TextDecorations="Strikethrough" Margin="12,0,0,4" VerticalAlignment="Bottom" />
+                    </StackPanel>
+                    <TextBlock x:Name="StockText" FontSize="13" FontWeight="SemiBold" Margin="0,2,0,16" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="BuyButton" Content="Купить" Width="180" Height="42" FontSize="15"
+                                Style="{StaticResource PrimaryButton}" Click="Buy_Click" />
+                        <Button Content="Закрыть" Width="120" Height="42" Margin="10,0,0,0"
+                                Style="{StaticResource SecondaryButton}" Click="Close_Click" />
+                    </StackPanel>
+                    <TextBlock x:Name="StatusText" Foreground="{StaticResource SuccessBrush}" FontSize="12"
+                               Margin="0,10,0,0" />
+                </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="1" Height="1" Background="{StaticResource BorderBrush}" Margin="0,20" />
+
+            <StackPanel Grid.Row="2">
+                <TextBlock Text="Описание" Style="{StaticResource SectionTitleText}" Margin="0,0,0,8" />
+                <TextBlock x:Name="DescriptionText" FontSize="14" TextWrapping="Wrap" LineHeight="22"
+                           Foreground="{StaticResource TextBrush}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Margin="0,22,0,0">
+                <TextBlock Text="Характеристики" Style="{StaticResource SectionTitleText}" Margin="0,0,0,10" />
+                <ItemsControl x:Name="GroupsList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextBrush}" Margin="0,0,0,6" />
+                                <Border Style="{StaticResource CardBorder}" Padding="0">
+                                    <ItemsControl ItemsSource="{Binding Items}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="14,8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="260" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Name}" Style="{StaticResource SecondaryText}"
+                                                               FontSize="13" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="13"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               TextWrapping="Wrap" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Window>
+
