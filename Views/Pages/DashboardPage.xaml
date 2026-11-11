@@ -17,7 +17,7 @@
                                 Background="#FF1F1F1F" Foreground="{StaticResource AccentBrush}"
                                 Style="{StaticResource SecondaryButton}" Click="CatalogButton_Click" />
                     </StackPanel>
-                    <TextBlock Text="20 товаров · 9 категорий" FontSize="13" HorizontalAlignment="Right"
+                    <TextBlock Text="40 товаров · 19 категорий" FontSize="13" HorizontalAlignment="Right"
                                VerticalAlignment="Bottom" Opacity="0.75" />
                 </Grid>
             </Border>

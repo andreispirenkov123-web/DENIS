@@ -56,6 +56,7 @@ public class MainWindowViewModel : ViewModelBase
         Pages.Add(_dashboard);
         Pages.Add(_products);
         Pages.Add(_cart);
+        Pages.Add(new WarehouseViewModel());
         Pages.Add(new SalesViewModel());
         Pages.Add(new ClientsViewModel());
         Pages.Add(new SuppliesViewModel());

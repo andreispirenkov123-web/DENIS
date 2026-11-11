@@ -22,6 +22,7 @@ public class Product
     public decimal Rating { get; set; }
     public int ReviewsCount { get; set; }
     public int WarrantyMonths { get; set; }
+    public int MinStock { get; set; } = 2;
     public string? Description { get; set; }
     public string? ImagePath { get; set; }
     public bool IsActive { get; set; }
@@ -39,5 +40,11 @@ public class Product
     public string StockText => $"Остаток: {Stock} шт.";
     public string WarrantyText => $"Гарантия {WarrantyMonths} мес.";
     public string ActiveText => IsActive ? "В продаже" : "Снят с продажи";
+    public bool IsLowStock => Stock <= MinStock;
+    public string StockStatusText => Stock <= 0 ? "Нет в наличии" : IsLowStock ? "Мало" : "В наличии";
+    public string PurchaseSumText => $"{(PurchasePrice * Stock).ToString("N0", Ru)} ₽";
+    public string RetailSumText => $"{(RetailPrice * Stock).ToString("N0", Ru)} ₽";
+    public decimal PurchaseSum => PurchasePrice * Stock;
+    public decimal RetailSum => RetailPrice * Stock;
     public override string ToString() => $"{Name} ({Sku})";
 }

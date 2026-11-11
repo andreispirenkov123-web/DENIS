@@ -69,11 +69,12 @@ public static class ScreenshotService
         CaptureMain(admin, 0, 0, Path.Combine(directory, "11_home.png"));
         CaptureMain(admin, 1, 0, Path.Combine(directory, "05_catalog_cards.png"));
         CaptureMain(admin, 1, 1, Path.Combine(directory, "06_catalog_list.png"));
-        CaptureMain(admin, 3, 0, Path.Combine(directory, "07_orders.png"));
-        CaptureMain(admin, 4, 0, Path.Combine(directory, "08_clients.png"));
+        CaptureMain(admin, 4, 0, Path.Combine(directory, "07_orders.png"));
+        CaptureMain(admin, 5, 0, Path.Combine(directory, "08_clients.png"));
         CaptureMain(admin, 2, 0, Path.Combine(directory, "13_cart.png"));
-        CaptureMain(admin, 6, 0, Path.Combine(directory, "12_users.png"));
-        CaptureMain(admin, 7, 0, Path.Combine(directory, "14_reports.png"));
+        CaptureMain(admin, 3, 0, Path.Combine(directory, "19_warehouse.png"));
+        CaptureMain(admin, 7, 0, Path.Combine(directory, "12_users.png"));
+        CaptureMain(admin, 8, 0, Path.Combine(directory, "14_reports.png"));
         CaptureMain(manager, 1, 0, Path.Combine(directory, "09_manager_catalog.png"));
 
         CartService.Instance.Clear();
@@ -81,6 +82,8 @@ public static class ScreenshotService
         var product = Database.GetProducts().FirstOrDefault();
         if (product != null)
             CaptureWindow(new ProductEditWindow(product) { Width = 660 }, Path.Combine(directory, "15_product_edit.png"));
+            CaptureWindow(new StockAdjustmentWindow(product, false) { Width = 470 },
+                Path.Combine(directory, "20_stock_adjustment.png"));
         var sale = Database.GetSales().FirstOrDefault();
         if (sale != null)
             CaptureWindow(new SaleEditWindow(sale) { Width = 820, Height = 720 },

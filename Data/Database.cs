@@ -194,7 +194,7 @@ public static class Database
         using var command = new NpgsqlCommand(
             $@"SELECT p.id, p.name, p.category_id, c.name, p.supplier_id, s.name, p.manufacturer,
                       p.model, p.sku, p.purchase_price, p.retail_price, p.warranty_months,
-                      p.description, p.image_path, p.old_price, p.rating, p.reviews_count, p.is_active, COALESCE(ps.stock, 0)
+                      p.description, p.image_path, p.old_price, p.rating, p.reviews_count, p.min_stock, p.is_active, COALESCE(ps.stock, 0)
                FROM product p
                JOIN category c ON c.id = p.category_id
                JOIN supplier s ON s.id = p.supplier_id
@@ -216,7 +216,7 @@ public static class Database
         using var command = new NpgsqlCommand(
             @"SELECT p.id, p.name, p.category_id, c.name, p.supplier_id, s.name, p.manufacturer,
                      p.model, p.sku, p.purchase_price, p.retail_price, p.warranty_months,
-                     p.description, p.image_path, p.old_price, p.rating, p.reviews_count, p.is_active, COALESCE(ps.stock, 0)
+                     p.description, p.image_path, p.old_price, p.rating, p.reviews_count, p.min_stock, p.is_active, COALESCE(ps.stock, 0)
               FROM product p
               JOIN category c ON c.id = p.category_id
               JOIN supplier s ON s.id = p.supplier_id
@@ -237,7 +237,7 @@ public static class Database
         ImagePath = r.IsDBNull(13) ? null : r.GetString(13),
         OldPrice = r.IsDBNull(14) ? null : r.GetDecimal(14),
         Rating = r.GetDecimal(15), ReviewsCount = r.GetInt32(16),
-        IsActive = r.GetBoolean(17), Stock = r.GetInt32(18)
+        MinStock = r.GetInt32(17), IsActive = r.GetBoolean(18), Stock = r.GetInt32(19)
     };
 
     public static int SaveProduct(Product p)
@@ -247,8 +247,10 @@ public static class Database
         {
             using var command = new NpgsqlCommand(
                 @"INSERT INTO product (name, category_id, supplier_id, manufacturer, model, sku,
-                                       purchase_price, retail_price, old_price, warranty_months, description, image_path, is_active)
-                  VALUES (@name,@cat,@sup,@man,@model,@sku,@purchase,@retail,@oldprice,@warranty,@desc,@image,@active)
+                                       purchase_price, retail_price, old_price, warranty_months,
+                                       description, image_path, min_stock, is_active)
+                  VALUES (@name,@cat,@sup,@man,@model,@sku,@purchase,@retail,@oldprice,@warranty,
+                          @desc,@image,@minstock,@active)
                   RETURNING id", connection);
             AddProductParams(command, p);
             return Convert.ToInt32(command.ExecuteScalar());
@@ -257,7 +259,7 @@ public static class Database
                    @"UPDATE product SET name=@name, category_id=@cat, supplier_id=@sup, manufacturer=@man,
                           model=@model, sku=@sku, purchase_price=@purchase, retail_price=@retail,
                           old_price=@oldprice, warranty_months=@warranty, description=@desc,
-                          image_path=@image, is_active=@active
+                          image_path=@image, min_stock=@minstock, is_active=@active
                      WHERE id=@id", connection))
         {
             AddProductParams(command, p);
@@ -278,6 +280,7 @@ public static class Database
         command.Parameters.AddWithValue("purchase", p.PurchasePrice);
         command.Parameters.AddWithValue("retail", p.RetailPrice);
         command.Parameters.AddWithValue("oldprice", (object?)p.OldPrice ?? DBNull.Value);
+        command.Parameters.AddWithValue("minstock", p.MinStock);
         command.Parameters.AddWithValue("warranty", p.WarrantyMonths);
         command.Parameters.AddWithValue("desc", (object?)p.Description ?? DBNull.Value);
         command.Parameters.AddWithValue("image", (object?)p.ImagePath ?? DBNull.Value);
@@ -290,6 +293,67 @@ public static class Database
         using var command = new NpgsqlCommand("DELETE FROM product WHERE id=@id", connection);
         command.Parameters.AddWithValue("id", id);
         command.ExecuteNonQuery();
+    }
+
+    public static StockSummary GetStockSummary()
+    {
+        using var connection = CreateConnection();
+        using var command = new NpgsqlCommand(
+            @"SELECT count(*), COALESCE(SUM(ps.stock),0),
+                     COALESCE(SUM(ps.stock * p.purchase_price),0),
+                     COALESCE(SUM(ps.stock * p.retail_price),0),
+                     COALESCE(SUM(CASE WHEN ps.stock <= p.min_stock THEN 1 ELSE 0 END),0)
+              FROM product_stock ps JOIN product p ON p.id = ps.product_id", connection);
+        using var reader = command.ExecuteReader();
+        reader.Read();
+        return new StockSummary
+        {
+            ProductsCount = reader.GetInt32(0),
+            UnitsCount = Convert.ToInt32(reader.GetDecimal(1)),
+            PurchaseValue = reader.GetDecimal(2),
+            RetailValue = reader.GetDecimal(3),
+            LowStockCount = Convert.ToInt32(reader.GetInt64(4))
+        };
+    }
+
+    public static List<StockMovement> GetStockMovements(int productId = 0, int limit = 120)
+    {
+        var list = new List<StockMovement>();
+        using var connection = CreateConnection();
+        using var command = new NpgsqlCommand(
+            @"SELECT movement_type, document_id, document, product_id, product_name, sku,
+                     quantity, movement_date, user_name, comment
+              FROM stock_movements
+              WHERE (@pid = 0 OR product_id = @pid)
+              ORDER BY movement_date DESC, document_id DESC
+              LIMIT @limit", connection);
+        command.Parameters.AddWithValue("pid", productId);
+        command.Parameters.AddWithValue("limit", limit);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            list.Add(new StockMovement
+            {
+                MovementType = reader.GetString(0), DocumentId = reader.GetInt32(1),
+                Document = reader.GetString(2), ProductId = reader.GetInt32(3),
+                ProductName = reader.GetString(4), Sku = reader.GetString(5),
+                Quantity = reader.GetInt32(6), MovementDate = reader.GetDateTime(7),
+                UserName = reader.GetString(8), Comment = reader.IsDBNull(9) ? null : reader.GetString(9)
+            });
+        return list;
+    }
+
+    public static int SaveStockAdjustment(int productId, int delta, string reason, string? comment, int userId)
+    {
+        using var connection = CreateConnection();
+        using var command = new NpgsqlCommand(
+            @"INSERT INTO stock_adjustment (product_id, quantity_delta, reason, comment, user_id)
+              VALUES (@product, @delta, @reason, @comment, @user) RETURNING id", connection);
+        command.Parameters.AddWithValue("product", productId);
+        command.Parameters.AddWithValue("delta", delta);
+        command.Parameters.AddWithValue("reason", reason);
+        command.Parameters.AddWithValue("comment", (object?)comment ?? DBNull.Value);
+        command.Parameters.AddWithValue("user", userId);
+        return Convert.ToInt32(command.ExecuteScalar());
     }
 
     public static List<Category> GetCategoriesWithCounts()
@@ -930,7 +994,7 @@ public static class Database
         using var command = new NpgsqlCommand(
             @"SELECT p.id, p.name, p.category_id, c.name, p.supplier_id, s.name, p.manufacturer,
                      p.model, p.sku, p.purchase_price, p.retail_price, p.warranty_months,
-                     p.description, p.image_path, p.old_price, p.rating, p.reviews_count, p.is_active, COALESCE(ps.stock, 0)
+                     p.description, p.image_path, p.old_price, p.rating, p.reviews_count, p.min_stock, p.is_active, COALESCE(ps.stock, 0)
               FROM product p
               JOIN category c ON c.id = p.category_id
               JOIN supplier s ON s.id = p.supplier_id

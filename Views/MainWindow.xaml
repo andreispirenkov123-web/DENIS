@@ -11,6 +11,7 @@
         <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><pages:DashboardPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:ProductsViewModel}"><pages:ProductsPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:CartViewModel}"><pages:CartPage /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:WarehouseViewModel}"><pages:WarehousePage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:SalesViewModel}"><pages:SalesPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:ClientsViewModel}"><pages:ClientsPage /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:SuppliesViewModel}"><pages:SuppliesPage /></DataTemplate>

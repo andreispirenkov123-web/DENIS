@@ -19,6 +19,7 @@ public partial class ProductEditWindow : Window
         SupplierBox.ItemsSource = Database.GetSuppliers();
         ActiveCheck.IsChecked = true;
         WarrantyBox.Text = "12";
+        MinStockBox.Text = "2";
         CategoryBox.SelectedIndex = 0;
         SupplierBox.SelectedIndex = 0;
 
@@ -35,6 +36,7 @@ public partial class ProductEditWindow : Window
         DescriptionBox.Text = _product.Description ?? string.Empty;
         ImageBox.Text = _product.ImagePath ?? string.Empty;
         ActiveCheck.IsChecked = _product.IsActive;
+        MinStockBox.Text = _product.MinStock.ToString();
         CategoryBox.SelectedItem = ((List<Category>)CategoryBox.ItemsSource).FirstOrDefault(c => c.Id == _product.CategoryId);
         SupplierBox.SelectedItem = ((List<Supplier>)SupplierBox.ItemsSource).FirstOrDefault(s => s.Id == _product.SupplierId);
     }
@@ -92,6 +94,8 @@ public partial class ProductEditWindow : Window
         _product.WarrantyMonths = warranty;
         _product.Description = string.IsNullOrWhiteSpace(DescriptionBox.Text) ? null : DescriptionBox.Text.Trim();
         _product.ImagePath = string.IsNullOrWhiteSpace(ImageBox.Text) ? null : ImageBox.Text.Trim();
+        if (!int.TryParse(MinStockBox.Text, out var minStock) || minStock < 0) minStock = 2;
+        _product.MinStock = minStock;
         _product.IsActive = ActiveCheck.IsChecked == true;
 
         try

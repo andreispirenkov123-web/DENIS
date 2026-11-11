@@ -138,11 +138,16 @@
                                                            FontSize="11" TextDecorations="Strikethrough" Margin="8,0,0,0"
                                                            VerticalAlignment="Bottom" />
                                             </StackPanel>
-                                            <TextBlock Style="{StaticResource SecondaryText}" FontSize="11" Margin="0,0,0,7">
-                                                <Run Text="В наличии: " />
-                                                <Run Text="{Binding Stock}" FontWeight="SemiBold" />
-                                                <Run Text=" шт." />
-                                            </TextBlock>
+                                            <Grid Margin="0,0,0,7">
+                                                <TextBlock Style="{StaticResource SecondaryText}" FontSize="11">
+                                                    <Run Text="Остаток: " />
+                                                    <Run Text="{Binding Stock}" FontWeight="SemiBold" />
+                                                    <Run Text=" шт." />
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding StockStatusText}" FontSize="11"
+                                                           FontWeight="SemiBold" HorizontalAlignment="Right"
+                                                           Foreground="{Binding Stock, Converter={StaticResource StockToBrush}}" />
+                                            </Grid>
                                             <Button Content="Купить" Height="36" Style="{StaticResource PrimaryButton}"
                                                     FontWeight="SemiBold"
                                                     Command="{Binding DataContext.AddToCartCommand,
