@@ -383,7 +383,7 @@ public static class Database
             @"SELECT p.id, p.name, p.category_id, c.name, p.supplier_id, s.name, p.manufacturer,
                      p.model, p.sku, p.purchase_price, p.retail_price, p.warranty_months,
                      p.description, p.image_path, p.old_price, p.rating, p.reviews_count,
-                     p.is_active, COALESCE(ps.stock, 0)
+                     p.min_stock, p.is_active, COALESCE(ps.stock, 0)
               FROM product p
               JOIN category c ON c.id = p.category_id
               JOIN supplier s ON s.id = p.supplier_id
