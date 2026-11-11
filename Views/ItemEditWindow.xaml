@@ -1,0 +1,45 @@
+<Window x:Class="HouseholdGoodsIS.Views.ItemEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Позиция" Width="480" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="TitleText" Grid.Row="0" Text="Позиция" Style="{StaticResource SectionTitleText}"
+                   Margin="0,0,0,16" />
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="Товар *" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />
+            <ComboBox x:Name="ProductBox" DisplayMemberPath="Name" SelectionChanged="ProductBox_SelectionChanged" />
+        </StackPanel>
+        <Grid Grid.Row="2" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="Количество *" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />
+                <TextBox x:Name="QuantityBox" Style="{StaticResource InputTextBox}" Text="1" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock x:Name="PriceLabel" Text="Цена, ₽ *" Style="{StaticResource SecondaryText}"
+                           Margin="0,0,0,4" />
+                <TextBox x:Name="PriceBox" Style="{StaticResource InputTextBox}" />
+            </StackPanel>
+        </Grid>
+        <TextBlock x:Name="StockText" Grid.Row="3" Style="{StaticResource SecondaryText}" Margin="0,10,0,0" />
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <TextBlock x:Name="ErrorText" Foreground="{StaticResource ErrorBrush}" FontSize="12"
+                       VerticalAlignment="Center" Margin="0,0,16,0" />
+            <Button Content="Отмена" Width="92" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                    Click="Cancel_Click" />
+            <Button Content="Добавить" Width="110" Style="{StaticResource PrimaryButton}" Click="Save_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

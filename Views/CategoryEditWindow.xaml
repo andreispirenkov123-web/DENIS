@@ -1,0 +1,29 @@
+<Window x:Class="HouseholdGoodsIS.Views.CategoryEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Категория" Width="460" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="TitleText" Grid.Row="0" Text="Категория" Style="{StaticResource SectionTitleText}"
+                   Margin="0,0,0,16" />
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="Название *" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />
+            <TextBox x:Name="NameBox" Style="{StaticResource InputTextBox}" Margin="0,0,0,10" />
+            <TextBlock Text="Описание" Style="{StaticResource SecondaryText}" Margin="0,0,0,4" />
+            <TextBox x:Name="DescriptionBox" Style="{StaticResource InputTextBox}" Height="56"
+                     TextWrapping="Wrap" AcceptsReturn="True" VerticalContentAlignment="Top" Padding="9,6" />
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <TextBlock x:Name="ErrorText" Foreground="{StaticResource ErrorBrush}" FontSize="12"
+                       VerticalAlignment="Center" Margin="0,0,16,0" />
+            <Button Content="Отмена" Width="92" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                    Click="Cancel_Click" />
+            <Button Content="Сохранить" Width="110" Style="{StaticResource PrimaryButton}" Click="Save_Click" />
+        </StackPanel>
+    </Grid>
+</Window>
