@@ -6,7 +6,7 @@ WPF-приложение (.NET 10) для магазина бытовой тех
 ## Запуск
 
 1. Развернуть базу данных `household_goods_db` скриптами из `04_База_данных`.
-2. Открыть `HouseholdGoodsIS.sln` в Visual Studio или выполнить:
+2. Открыть `HouseholdGoodsIS.slnx` в Visual Studio или выполнить:
 
 ```
 dotnet run
@@ -31,3 +31,4 @@ dotnet run
 
 `HouseholdGoodsIS.exe --screenshots <каталог>` — служебный режим формирования
 скриншотов для документации.
+
