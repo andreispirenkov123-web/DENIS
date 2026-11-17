@@ -1,6 +1,5 @@
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Магазин самовывоза.</summary>
 public class Store
 {
     public int Id { get; set; }

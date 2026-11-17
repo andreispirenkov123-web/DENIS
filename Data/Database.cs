@@ -3,7 +3,7 @@ using Npgsql;
 
 namespace HouseholdGoodsIS.Data;
 
-/// <summary>Доступ к базе данных PostgreSQL (АИС «Бытовые товары»).</summary>
+
 public static class Database
 {
     public const string ConnectionString =
@@ -24,7 +24,6 @@ public static class Database
         return ((string?)command.ExecuteScalar() ?? string.Empty).Split(',')[0];
     }
 
-    // ======================= ПОЛЬЗОВАТЕЛИ =======================
     public static AppUser? Authorize(string login, string password)
     {
         using var connection = CreateConnection();
@@ -178,7 +177,6 @@ public static class Database
         LastLogin = reader.IsDBNull(12) ? null : reader.GetDateTime(12)
     };
 
-    // ======================= ТОВАРЫ =======================
     public static List<Product> GetProducts(string search = "", string category = "", int sortMode = 0)
     {
         var list = new List<Product>();
@@ -426,7 +424,6 @@ public static class Database
         return value == null || value == DBNull.Value ? 0 : Convert.ToInt32(value);
     }
 
-    // ======================= КАТЕГОРИИ =======================
     public static List<Category> GetCategories()
     {
         var list = new List<Category>();
@@ -469,7 +466,6 @@ public static class Database
         command.ExecuteNonQuery();
     }
 
-    // ======================= ПОСТАВЩИКИ =======================
     public static List<Supplier> GetSuppliers()
     {
         var list = new List<Supplier>();
@@ -540,7 +536,6 @@ public static class Database
         command.ExecuteNonQuery();
     }
 
-    // ======================= КЛИЕНТЫ =======================
     public static List<Client> GetClients(string search = "")
     {
         var list = new List<Client>();
@@ -619,7 +614,6 @@ public static class Database
         command.ExecuteNonQuery();
     }
 
-    // ======================= ПРОДАЖИ =======================
     public static List<Sale> GetSales(string search = "", string status = "")
     {
         var list = new List<Sale>();
@@ -766,7 +760,6 @@ public static class Database
         command.ExecuteNonQuery();
     }
 
-    // ======================= ПЛАТЕЖИ =======================
     public static List<Payment> GetPayments(int saleId)
     {
         var list = new List<Payment>();
@@ -825,7 +818,6 @@ public static class Database
         command.ExecuteNonQuery();
     }
 
-    // ======================= ПОСТАВКИ =======================
     public static List<Supply> GetSupplies(string search = "", string status = "")
     {
         var list = new List<Supply>();
@@ -972,7 +964,6 @@ public static class Database
         command.ExecuteNonQuery();
     }
 
-    // ======================= АНАЛИТИКА =======================
     public static DashboardStats GetDashboardStats()
     {
         using var connection = CreateConnection();

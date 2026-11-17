@@ -1,6 +1,5 @@
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Поставка товаров от поставщика.</summary>
 public class Supply
 {
     public int Id { get; set; }

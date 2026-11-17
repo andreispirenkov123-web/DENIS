@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:HouseholdGoodsIS.ViewModels"
         xmlns:pages="clr-namespace:HouseholdGoodsIS.Views.Pages"
-        Title="Бытовые товары — магазин бытовой техники"
+        Title="DENIS — магазин бытовой техники"
         Height="900" Width="1440" MinHeight="720" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
         Icon="pack://application:,,,/Resources/Icons/app.ico">
@@ -39,8 +39,8 @@
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Image Source="pack://application:,,,/Resources/Images/logo_icon.png" Width="42" Height="42" />
                     <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="Бытовые товары" FontSize="19" FontWeight="Bold" />
-                        <TextBlock Text="магазин техники для дома" Style="{StaticResource SecondaryText}" FontSize="11" />
+                        <TextBlock Text="DENIS" FontSize="19" FontWeight="Bold" />
+                        <TextBlock Text="магазин бытовой техники" Style="{StaticResource SecondaryText}" FontSize="11" />
                     </StackPanel>
                 </StackPanel>
 

@@ -1,6 +1,5 @@
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Категория бытовых товаров.</summary>
 public class Category
 {
     public int Id { get; set; }

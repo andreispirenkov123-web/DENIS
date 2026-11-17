@@ -2,7 +2,6 @@ using System.Globalization;
 
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Позиция корзины покупателя.</summary>
 public class CartItem
 {
     private static readonly CultureInfo Ru = CultureInfo.GetCultureInfo("ru-RU");

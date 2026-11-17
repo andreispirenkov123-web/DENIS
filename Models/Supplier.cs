@@ -1,6 +1,5 @@
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Поставщик бытовой техники.</summary>
 public class Supplier
 {
     public int Id { get; set; }

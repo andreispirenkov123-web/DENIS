@@ -16,7 +16,6 @@ using HouseholdGoodsIS.Views;
 
 namespace HouseholdGoodsIS;
 
-/// <summary>Служебный режим формирования скриншотов для документации.</summary>
 public static class ScreenshotService
 {
     [DllImport("user32.dll")]
@@ -58,7 +57,6 @@ public static class ScreenshotService
                 "Подтверждение действия", DialogType.Question),
             Path.Combine(directory, "10_dialog_question.png"));
 
-        // товары в корзине для наглядного скриншота
         var products = Database.GetProducts();
         if (products.Count >= 2)
         {
@@ -72,8 +70,8 @@ public static class ScreenshotService
         CaptureMain(admin, 4, 0, Path.Combine(directory, "07_orders.png"));
         CaptureMain(admin, 2, 0, Path.Combine(directory, "13_cart.png"));
         CaptureMain(admin, 3, 0, Path.Combine(directory, "19_warehouse.png"));
-        CaptureMain(admin, 7, 0, Path.Combine(directory, "12_users.png"));
-        CaptureMain(admin, 8, 0, Path.Combine(directory, "14_reports.png"));
+        CaptureMain(admin, 6, 0, Path.Combine(directory, "12_users.png"));
+        CaptureMain(admin, 7, 0, Path.Combine(directory, "14_reports.png"));
         CaptureMain(manager, 1, 0, Path.Combine(directory, "09_manager_catalog.png"));
 
         CartService.Instance.Clear();

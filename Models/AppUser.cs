@@ -1,6 +1,5 @@
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Сотрудник магазина — пользователь системы.</summary>
 public class AppUser
 {
     public int Id { get; set; }

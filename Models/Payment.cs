@@ -1,6 +1,5 @@
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Оплата продажи.</summary>
 public class Payment
 {
     public int Id { get; set; }

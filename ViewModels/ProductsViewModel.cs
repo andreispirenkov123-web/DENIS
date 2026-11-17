@@ -102,7 +102,6 @@ public class ProductsViewModel : PageViewModelBase
         }
         catch
         {
-            // категории загрузятся при следующем обновлении
         }
     }
 

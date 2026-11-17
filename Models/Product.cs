@@ -2,7 +2,6 @@ using System.Globalization;
 
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Бытовой товар (техника).</summary>
 public class Product
 {
     private static readonly CultureInfo Ru = CultureInfo.GetCultureInfo("ru-RU");

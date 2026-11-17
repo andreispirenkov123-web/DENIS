@@ -1,7 +1,7 @@
 <Window x:Class="HouseholdGoodsIS.Views.AuthorizationWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Вход — Бытовые товары"
+        Title="Вход — DENIS"
         Height="680" Width="480"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -18,7 +18,7 @@
                 <StackPanel Orientation="Horizontal">
                     <Image Source="pack://application:,,,/Resources/Images/logo_icon.png" Width="48" Height="48" />
                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="Бытовые товары" FontSize="22" FontWeight="SemiBold" />
+                        <TextBlock Text="DENIS" FontSize="22" FontWeight="SemiBold" />
                         <TextBlock Text="Учёт и продажи бытовой техники · ДНС" Style="{StaticResource SecondaryText}" />
                     </StackPanel>
                 </StackPanel>
@@ -47,7 +47,7 @@
             </StackPanel>
         </Border>
 
-        <TextBlock Grid.Row="1" Text="Бытовые товары · Ярославль · 2026" Style="{StaticResource SecondaryText}"
+        <TextBlock Grid.Row="1" Text="DENIS · Ярославль · 2026" Style="{StaticResource SecondaryText}"
                    HorizontalAlignment="Center" Margin="0,0,0,18" />
     </Grid>
 </Window>

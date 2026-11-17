@@ -3,7 +3,6 @@ using HouseholdGoodsIS.Models;
 
 namespace HouseholdGoodsIS.Services;
 
-/// <summary>Корзина покупателя (общая для витрины и страницы корзины).</summary>
 public sealed class CartService
 {
     public static CartService Instance { get; } = new();

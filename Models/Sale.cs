@@ -1,6 +1,5 @@
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Продажа (заказ покупателя).</summary>
 public class Sale
 {
     public int Id { get; set; }

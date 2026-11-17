@@ -36,7 +36,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public string PageTitle => SelectedPage is PageViewModelBase page ? page.Title : "Бытовые товары";
+    public string PageTitle => SelectedPage is PageViewModelBase page ? page.Title : "DENIS";
     public string UserFullName => Account.FullName;
     public string RoleName => Account.RoleName;
     public string UserChip => $"{Account.Login} · {Account.RoleName}";

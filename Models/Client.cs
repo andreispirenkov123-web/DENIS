@@ -1,6 +1,5 @@
 namespace HouseholdGoodsIS.Models;
 
-/// <summary>Покупатель магазина.</summary>
 public class Client
 {
     public int Id { get; set; }
