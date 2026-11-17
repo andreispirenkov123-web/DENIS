@@ -19,7 +19,7 @@
                     <Image Source="pack://application:,,,/Resources/Images/logo_icon.png" Width="48" Height="48" />
                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="DENIS" FontSize="22" FontWeight="SemiBold" />
-                        <TextBlock Text="Учёт и продажи бытовой техники · ДНС" Style="{StaticResource SecondaryText}" />
+                        <TextBlock Text="магазин бытовой техники" Style="{StaticResource SecondaryText}" />
                     </StackPanel>
                 </StackPanel>
 

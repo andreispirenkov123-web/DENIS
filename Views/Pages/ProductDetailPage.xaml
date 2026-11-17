@@ -64,6 +64,8 @@
                                 Style="{StaticResource PrimaryButton}" Command="{Binding AddToCartCommand}" />
                         <Button Content="Назад" Width="120" Height="42" Margin="10,0,0,0"
                                 Style="{StaticResource SecondaryButton}" Command="{Binding BackCommand}" />
+                        <Button Content="Удалить" Width="120" Height="42" Margin="10,0,0,0"
+                                Style="{StaticResource DangerButton}" Command="{Binding DeleteCommand}" />
                     </StackPanel>
                     <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource SuccessBrush}"
                                FontSize="12" Margin="0,10,0,0" />

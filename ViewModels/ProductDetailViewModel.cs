@@ -7,6 +7,7 @@ namespace HouseholdGoodsIS.ViewModels;
 public class ProductDetailViewModel : PageViewModelBase
 {
     private string _statusMessage = string.Empty;
+    private readonly IDialogService _dialogService = ServiceContainer.Instance.Get<IDialogService>();
 
     public ProductDetailViewModel(Product product)
     {
@@ -25,6 +26,7 @@ public class ProductDetailViewModel : PageViewModelBase
 
         BackCommand = new RelayCommand(_ => MainVm?.NavigateBack());
         AddToCartCommand = new RelayCommand(_ => AddToCart());
+        DeleteCommand = new RelayCommand(_ => DeleteProduct());
     }
 
     public Product Product { get; }
@@ -32,6 +34,7 @@ public class ProductDetailViewModel : PageViewModelBase
     public List<AttributeGroup> Groups { get; }
     public RelayCommand BackCommand { get; }
     public RelayCommand AddToCartCommand { get; }
+    public RelayCommand DeleteCommand { get; }
 
     public string StatusMessage
     {
@@ -50,5 +53,23 @@ public class ProductDetailViewModel : PageViewModelBase
             StatusMessage = "Товар добавлен в корзину.";
         else
             StatusMessage = $"На складе только {Product.Stock} шт.";
+    }
+
+    private void DeleteProduct()
+    {
+        var result = _dialogService.ShowDialog($"Удалить товар «{Product.Name}»?",
+            "Удаление товара", DialogType.Question);
+        if (result != DialogResult.Yes) return;
+        try
+        {
+            Database.DeleteProduct(Product.Id);
+            MainVm?.NavigateBack();
+            MainVm?.RefreshCurrentPage();
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowDialog("Не удалось удалить товар. Возможно, он используется в продажах или поставках.\n"
+                                      + ex.Message, "Ошибка удаления", DialogType.Error);
+        }
     }
 }
